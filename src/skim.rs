@@ -27,6 +27,7 @@ const BONUS_SEPARATOR: i64 = 8;
 const BONUS_CAMEL: i64 = 8;
 const PENALTY_CASE_UNMATCHED: i64 = -1;
 const PENALTY_LEADING: i64 = -6; // penalty applied for every letter before the first match
+const PENALTY_WORD_TRAILING: i64 = -2; // same but within the word of the last match
 const PENALTY_MAX_LEADING: i64 = -18; // maxing penalty for leading letters
 const PENALTY_UNMATCHED: i64 = -2;
 
@@ -181,6 +182,16 @@ fn build_graph(choice: &str, pattern: &str) -> Option<Vec<Vec<MatchingStatus>>> 
                     ..next
                 }
             };
+        }
+    }
+
+    for mut status in scores.last_mut().unwrap_or(&mut vec![]).iter_mut() {
+        for ch in choice.chars().skip(status.idx+1) {
+            if !(char_type_of(ch) == CharType::Separ) {
+                status.final_score += PENALTY_WORD_TRAILING;
+            } else {
+                break
+            }
         }
     }
 
